@@ -3,7 +3,7 @@
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Enums; 
 
-namespace Ambev.DeveloperEvaluation.Domain.Entities.Sales
+namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
     public class SaleItem : BaseEntity
     {

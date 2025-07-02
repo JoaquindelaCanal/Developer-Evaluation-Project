@@ -6,7 +6,7 @@ using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Enums; 
 using Ambev.DeveloperEvaluation.Domain.Events.Sales;
 
-namespace Ambev.DeveloperEvaluation.Domain.Entities.Sales
+namespace Ambev.DeveloperEvaluation.Domain.Entities
 {
     public class Sale : BaseEntity
     {
