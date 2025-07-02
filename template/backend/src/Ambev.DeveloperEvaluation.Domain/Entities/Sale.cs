@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Ambev.DeveloperEvaluation.Domain.Common;
-using Ambev.DeveloperEvaluation.Domain.Enums; 
+using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Events.Sales;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities
@@ -86,8 +87,66 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
             itemToCancel.Cancel(); // Delegate cancellation to the SaleItem itself
             RecalculateTotal();
 
-            // Add a Domain Event for Item Cancelled
+            //Domain Event for Item Cancelled
             AddDomainEvent(new SaleItemCancelledEvent(Id, itemId));
+        }
+
+        public void UpdateCustomerDetails(string newCustomerName, Guid? newCustomerId) 
+        {
+            if (Status == SaleStatus.Cancelled) // prevent updates on cancelled sales
+            {
+                throw new InvalidOperationException("Cannot update customer details on a cancelled sale.");
+            }
+            if (CustomerName != newCustomerName || (newCustomerId.HasValue && CustomerId != newCustomerId.Value))
+            {
+                var oldCustomerName = CustomerName;
+                var oldCustomerId = CustomerId;
+
+                CustomerName = newCustomerName;
+                if (newCustomerId != null) CustomerId = newCustomerId.Value;
+
+                //domain event for the modification
+                AddDomainEvent(new SaleModifiedEvent(
+                    SaleId: Id,
+                    OldSaleNumber: SaleNumber,
+                    NewSaleNumber: SaleNumber,
+                    OldCustomerName: oldCustomerName,
+                    NewCustomerName: CustomerName,
+                    OldBranchName: BranchName,
+                    NewBranchName: BranchName,
+                    ModifiedDate: DateTime.UtcNow,
+                    ChangedProperties: new List<string> { "CustomerName", (newCustomerId.HasValue ? "CustomerId" : null) }.Where(p => p != null).ToList()
+                ));
+            }
+        }
+
+        public void UpdateBranchDetails(string newBranchName, Guid? newBranchId) 
+        {
+            if (Status == SaleStatus.Cancelled) // prevent updates on cancelled sales
+            {
+                throw new InvalidOperationException("Cannot update branch details on a cancelled sale.");
+            }
+            if (BranchName != newBranchName || (newBranchId.HasValue && BranchId != newBranchId.Value))
+            {
+                var oldBranchName = BranchName;
+                var oldBranchId = BranchId;
+
+                BranchName = newBranchName;
+                if (newBranchId != null) BranchId = newBranchId.Value;
+
+                //domain event for the modification
+                AddDomainEvent(new SaleModifiedEvent(
+                    SaleId: Id,
+                    OldSaleNumber: SaleNumber,
+                    NewSaleNumber: SaleNumber,
+                    OldCustomerName: CustomerName,
+                    NewCustomerName: CustomerName,
+                    OldBranchName: oldBranchName,
+                    NewBranchName: BranchName,
+                    ModifiedDate: DateTime.UtcNow,
+                    ChangedProperties: new List<string> { "BranchName", (newBranchId.HasValue ? "BranchId" : null) }.Where(p => p != null).ToList()
+                ));
+            }
         }
 
         public void RecalculateTotal()

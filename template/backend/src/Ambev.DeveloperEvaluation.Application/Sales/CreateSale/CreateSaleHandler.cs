@@ -10,18 +10,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
-    public class CreateSaleCommandHandler : IRequestHandler<CreateSaleCommand, SaleDto>
+    public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, SaleDto>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<CreateSaleCommandHandler> _logger;
+        private readonly ILogger<CreateSaleHandler> _logger;
 
-        public CreateSaleCommandHandler(
+        public CreateSaleHandler(
             ISaleRepository saleRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ILogger<CreateSaleCommandHandler> logger)
+            ILogger<CreateSaleHandler> logger)
         {
             _saleRepository = saleRepository;
             _unitOfWork = unitOfWork;
