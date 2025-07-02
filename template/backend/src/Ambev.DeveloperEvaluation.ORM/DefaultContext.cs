@@ -26,6 +26,11 @@ namespace Ambev.DeveloperEvaluation.ORM
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
+        public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
+        {
+            _mediator = null;
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
@@ -94,7 +99,7 @@ namespace Ambev.DeveloperEvaluation.ORM
                    b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM") 
             );
           
-            return new DefaultContext(builder.Options, null); // Pass null for IMediator during design-time
+            return new DefaultContext(builder.Options);
         }
     }
 }
