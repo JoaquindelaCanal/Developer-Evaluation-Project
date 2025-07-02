@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ambev.DeveloperEvaluation.Application.Interfaces
+﻿namespace Ambev.DeveloperEvaluation.Application.Interfaces
 {
     public interface IUnitOfWork
     {
