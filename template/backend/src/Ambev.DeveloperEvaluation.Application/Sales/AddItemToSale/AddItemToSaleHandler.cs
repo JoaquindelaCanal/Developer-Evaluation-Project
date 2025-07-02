@@ -7,18 +7,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.AddItemToSale
 {
-    public class AddItemToSaleCommandHandler : IRequestHandler<AddItemToSaleCommand, SaleDto>
+    public class AddItemToSaleHandler : IRequestHandler<AddItemToSaleCommand, SaleDto>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<AddItemToSaleCommandHandler> _logger;
+        private readonly ILogger<AddItemToSaleHandler> _logger;
 
-        public AddItemToSaleCommandHandler(
+        public AddItemToSaleHandler(
             ISaleRepository saleRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ILogger<AddItemToSaleCommandHandler> logger)
+            ILogger<AddItemToSaleHandler> logger)
         {
             _saleRepository = saleRepository;
             _unitOfWork = unitOfWork;
