@@ -16,6 +16,8 @@ using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
+using Rebus.Bus;
+
 using Xunit;
 using Xunit.Abstractions;
 
@@ -28,11 +30,12 @@ namespace Ambev.DeveloperEvaluation.Functional.Sales.CreateSale
         private readonly ISaleRepository _saleRepository = Substitute.For<ISaleRepository>();
         private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
         private readonly IMapper _mapper = Substitute.For<IMapper>();
+        private readonly IBus _rebus = Substitute.For<IBus>();
         private readonly ILogger<CreateSaleHandler> _logger = Substitute.For<ILogger<CreateSaleHandler>>();
         private readonly Faker _faker = new();
 
         private CreateSaleHandler CreateHandler() =>
-            new CreateSaleHandler(_saleRepository, _unitOfWork, _mapper, _logger);
+            new CreateSaleHandler(_saleRepository, _unitOfWork, _mapper, _rebus, _logger);
 
 
         private CreateSaleCommand ValidCommand() => new(

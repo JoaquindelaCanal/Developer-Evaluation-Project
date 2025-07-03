@@ -29,9 +29,4 @@
     <ProjectReference Include="..\..\src\Ambev.DeveloperEvaluation.ORM\Ambev.DeveloperEvaluation.ORM.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Sales\ListSales\" />
-    <Folder Include="Sales\UpdateSale\" />
-  </ItemGroup>
-
 </Project>
