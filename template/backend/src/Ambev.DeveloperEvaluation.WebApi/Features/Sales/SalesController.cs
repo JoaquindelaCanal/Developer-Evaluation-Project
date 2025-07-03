@@ -1,5 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Common.Models.QueryParameters;
 using Ambev.DeveloperEvaluation.Application.DTOs;
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
 using Ambev.DeveloperEvaluation.Application.Sales.ListSales;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 
@@ -105,5 +107,77 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 
             return Ok(webApiResponse);
         }
+
+        /// <summary>
+        /// Creates a new sale.
+        /// </summary>
+        /// <param name="command">The command containing sale data.</param>
+        /// <returns>The ID of the newly created sale.</returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(ApiResponseWithData<Guid>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateSale([FromBody] CreateSaleCommand command)
+        {
+            if (command == null)
+            {
+                return BadRequest(new ApiResponse { Success = false, Message = "Request body cannot be empty." });
+            }
+
+            try
+            {
+                var newSale = await _mediator.Send(command);
+
+                // 201 Created with the ID of the new resource
+                return CreatedAtAction(nameof(ListSales), new { id = newSale.Id }, new ApiResponseWithData<Guid>
+                {
+                    Success = true,
+                    Message = "Sale created successfully.",
+                    Data = newSale.Id
+                });
+            }
+            catch (Application.Common.Exceptions.BadRequestException ex)
+            {
+                return BadRequest(new ApiResponse { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Success = false, Message = "An unexpected error occurred while creating the sale." });
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a sale by its unique identifier.
+        /// </summary>
+        /// <param name="id">The GUID of the sale to retrieve.</param>
+        /// <returns>A SaleDto if found, otherwise 404 Not Found.</returns>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponseWithData<SaleDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetSaleById(Guid id)
+        {
+            var query = new GetSaleByIdQuery(id);
+
+            try
+            {
+                var saleDto = await _mediator.Send(query);
+                return Ok(new ApiResponseWithData<SaleDto>
+                {
+                    Success = true,
+                    Message = "Sale retrieved successfully.",
+                    Data = saleDto
+                });
+            }
+            catch (Application.Common.Exceptions.NotFoundException ex)
+            {
+                return NotFound(new ApiResponse { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Success = false, Message = "An unexpected error occurred while retrieving the sale." });
+            }
+        }
+
     }
 }
