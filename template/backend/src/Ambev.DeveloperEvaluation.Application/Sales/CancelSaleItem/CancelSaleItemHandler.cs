@@ -1,8 +1,13 @@
 ﻿using Ambev.DeveloperEvaluation.Application.DTOs;
 using Ambev.DeveloperEvaluation.Application.Interfaces;
+
 using AutoMapper;
+
 using MediatR;
+
 using Microsoft.Extensions.Logging;
+
+using Rebus.Bus;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSaleItem
 {
@@ -11,17 +16,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSaleItem
         private readonly ISaleRepository _saleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IBus _rebusBus;
         private readonly ILogger<CancelSaleItemHandler> _logger;
 
         public CancelSaleItemHandler(
             ISaleRepository saleRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            IBus rebusBus,
             ILogger<CancelSaleItemHandler> logger)
         {
             _saleRepository = saleRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _rebusBus = rebusBus;
             _logger = logger;
         }
 
@@ -41,6 +49,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSaleItem
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Sale item {SaleItemId} in sale {SaleId} cancelled successfully.", request.SaleItemId, request.SaleId);
+
+            //var integrationEvent = new SaleItemCancelledIntegrationEventDto(sale);
+
+            //Publish the integration event using Rebus
+            //await _rebusBus.Publish(integrationEvent);
 
             return _mapper.Map<SaleDto>(sale);
         }

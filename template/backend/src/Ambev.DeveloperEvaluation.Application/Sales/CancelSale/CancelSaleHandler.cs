@@ -35,6 +35,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSale
             sale.Cancel(); //change status and raise SaleCancelledEvent and SaleItemCancelledEvents
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+            //var integrationEvent = new SaleCancelledIntegrationEventDto(sale);
+
+            //Publish the integration event using Rebus
+            //await _rebusBus.Publish(integrationEvent);
+
             _logger.LogInformation("Sale with Id: {SaleId} cancelled successfully.", request.SaleId);
         }
     }

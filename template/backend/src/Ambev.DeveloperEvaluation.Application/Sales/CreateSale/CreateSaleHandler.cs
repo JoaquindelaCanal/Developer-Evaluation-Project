@@ -1,13 +1,17 @@
-﻿using Ambev.DeveloperEvaluation.Application.Common.Exceptions;
+﻿using Ambev.DeveloperEvaluation.Application.Common.Contracts.Sales;
+using Ambev.DeveloperEvaluation.Application.Common.Exceptions;
 using Ambev.DeveloperEvaluation.Application.DTOs;
 using Ambev.DeveloperEvaluation.Application.Interfaces;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events.Sales;
 
 using AutoMapper;
 
 using MediatR;
 
 using Microsoft.Extensions.Logging;
+
+using Rebus.Bus;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
@@ -16,17 +20,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         private readonly ISaleRepository _saleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IBus _rebusBus;
         private readonly ILogger<CreateSaleHandler> _logger;
 
         public CreateSaleHandler(
             ISaleRepository saleRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            IBus rebusBus,
             ILogger<CreateSaleHandler> logger)
         {
             _saleRepository = saleRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _rebusBus = rebusBus;
             _logger = logger;
         }
 
@@ -79,6 +86,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             await _unitOfWork.SaveChangesAsync(cancellationToken); 
 
             _logger.LogInformation("Sale created successfully with Id: {SaleId}", sale.Id);
+
+            //Publish Domain events: await _mediator.Publish(new SaleCreatedEvent(sale), cancellationToken);
+
+            var integrationEvent = new SaleCreatedIntegrationEvent(sale);
+            
+            //Publish the integration event using Rebus
+            await _rebusBus.Publish(integrationEvent);
 
             return _mapper.Map<SaleDto>(sale);
         }

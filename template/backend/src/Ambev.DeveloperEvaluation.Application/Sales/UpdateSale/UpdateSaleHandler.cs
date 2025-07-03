@@ -1,9 +1,15 @@
-﻿using Ambev.DeveloperEvaluation.Application.DTOs;
+﻿using Ambev.DeveloperEvaluation.Application.Common.Contracts.Sales;
+using Ambev.DeveloperEvaluation.Application.DTOs;
 using Ambev.DeveloperEvaluation.Application.Interfaces;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+
 using AutoMapper;
+
 using MediatR;
+
 using Microsoft.Extensions.Logging;
+
+using Rebus.Bus;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
@@ -12,17 +18,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         private readonly ISaleRepository _saleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IBus _rebusBus;
         private readonly ILogger<UpdateSaleHandler> _logger;
 
         public UpdateSaleHandler(
             ISaleRepository saleRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            IBus rebusBus,
             ILogger<UpdateSaleHandler> logger)
         {
             _saleRepository = saleRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _rebusBus = rebusBus;
             _logger = logger;
         }
 
@@ -43,6 +52,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             await _unitOfWork.SaveChangesAsync(cancellationToken); // dispatches domain events
 
             _logger.LogInformation("Sale with Id: {SaleId} updated successfully.", sale.Id);
+
+            //var integrationEvent = new SaleItemModifiedIntegrationEventDto(sale);
+
+            //Publish the integration event using Rebus
+            //await _rebusBus.Publish(integrationEvent);
 
             return _mapper.Map<SaleDto>(sale);
         }
