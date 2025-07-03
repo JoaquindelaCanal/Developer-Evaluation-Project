@@ -1,8 +1,11 @@
-﻿using Ambev.DeveloperEvaluation.Application.Common.Models.QueryParameters;
+﻿using Ambev.DeveloperEvaluation.Application.Common.Exceptions;
+using Ambev.DeveloperEvaluation.Application.Common.Models.QueryParameters;
 using Ambev.DeveloperEvaluation.Application.DTOs;
+using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
 using Ambev.DeveloperEvaluation.Application.Sales.ListSales;
+using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 
 using AutoMapper;
@@ -176,6 +179,73 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Success = false, Message = "An unexpected error occurred while retrieving the sale." });
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing sale.
+        /// </summary>
+        /// <param name="id">The GUID of the sale to update.</param>
+        /// <param name="command">The command containing updated sale data.</param>
+        /// <returns>No content on success, or appropriate error response.</returns>
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateSale(Guid id, [FromBody] UpdateSaleCommand command)
+        {
+            if (command == null)
+            {
+                return BadRequest(new ApiResponse { Success = false, Message = "Request body cannot be empty." });
+            }
+
+            try
+            {
+                await _mediator.Send(command);
+
+                return NoContent();
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new ApiResponse { Success = false, Message = ex.Message });
+            }
+            catch (NotFoundException ex) 
+            {
+                return NotFound(new ApiResponse { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Success = false, Message = "An unexpected error occurred while updating the sale." });
+            }
+        }
+
+        
+        /// <summary>
+        /// Deletes a sale by its unique identifier.
+        /// </summary>
+        /// <param name="id">The GUID of the sale to delete.</param>
+        /// <returns>No content on success, or 404 Not Found.</returns>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteSale(Guid id)
+        {
+            var command = new CancelSaleCommand(id);
+            try
+            {
+                await _mediator.Send(command);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new ApiResponse { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Success = false, Message = "An unexpected error occurred while deleting the sale." });
             }
         }
 
