@@ -10,6 +10,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         Guid BranchId,
         string BranchName,
         string SaleNumber,
-        List<CreateSaleItemCommand> Items
+        List<SaleItemDto> Items
     ) : IRequest<SaleDto>;
 }

@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.DTOs;
+﻿using Ambev.DeveloperEvaluation.Application.Common.Exceptions;
+using Ambev.DeveloperEvaluation.Application.DTOs;
 using Ambev.DeveloperEvaluation.Application.Interfaces;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 
@@ -33,7 +34,16 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         {
             _logger.LogInformation("Creating new sale for CustomerId: {CustomerId}", request.CustomerId);
 
-            // Create the Sale entity
+            // bsic validation
+            if (string.IsNullOrWhiteSpace(request.CustomerName))
+            {
+                throw new BadRequestException("Customer name is required.");
+            }
+            if (request.Items == null || !request.Items.Any())
+            {
+                throw new BadRequestException("Sale must have at least one item.");
+            }
+
             var sale = new Sale(
                 request.CustomerId,
                 request.CustomerName,
@@ -42,7 +52,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 request.SaleNumber
             );
 
-            // Add items to the sale
             foreach (var itemCommand in request.Items)
             {
                 var saleItem = new SaleItem(
@@ -51,8 +60,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                     itemCommand.Quantity,
                     itemCommand.UnitPrice
                 );
+
+                if (saleItem.Quantity <= 0)
+                {
+                    throw new BadRequestException($"Quantity for product {saleItem.ProductId} must be greater than zero.");
+                }
+                if (saleItem.UnitPrice <= 0)
+                {
+                    throw new BadRequestException($"Unit price for product {saleItem.ProductId} must be greater than zero.");
+                }
+
                 sale.AddItem(saleItem);
             }
+
+            sale.RecalculateTotal();
 
             await _saleRepository.AddAsync(sale);
             await _unitOfWork.SaveChangesAsync(cancellationToken); 

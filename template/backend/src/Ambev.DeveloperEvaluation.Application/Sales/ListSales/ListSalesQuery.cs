@@ -4,7 +4,7 @@ using Ambev.DeveloperEvaluation.Application.DTOs;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.ListSales
 {
-    public class ListSalesQuery : IRequest<PaginatedResponse<SaleDto>>
+    public class ListSalesQuery : IRequest<ApplicationPaginatedList<SaleDto>>
     {
         public int Page { get; set; }
         public int Size { get; set; }

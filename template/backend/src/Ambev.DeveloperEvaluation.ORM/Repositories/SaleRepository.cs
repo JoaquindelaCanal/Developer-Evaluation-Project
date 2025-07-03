@@ -26,6 +26,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
                                  .FirstOrDefaultAsync(s => s.Id == id);
         }
 
+        public IQueryable<Sale> GetQueryableSales()
+        {
+            return _context.Sales.AsQueryable();
+        }
+
         public async Task<IEnumerable<Sale>> GetAllAsync(int pageNumber, int pageSize, string sortBy, string search, CancellationToken cancellationToken)
         {
             IQueryable<Sale> query = _context.Sales.AsQueryable();
