@@ -1,13 +1,14 @@
-﻿using Ambev.DeveloperEvaluation.Application.DTOs;
-
-using MediatR;
+﻿using MediatR;
+using Ambev.DeveloperEvaluation.Application.Common.Models.QueryParameters;
+using Ambev.DeveloperEvaluation.Application.DTOs;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.ListSales
 {
-    public record ListSalesQuery(
-        int PageNumber = 1,
-        int PageSize = 10,
-        string SortBy = "SaleDate", // default sort
-        string Search = null
-    ) : IRequest<IEnumerable<SaleDto>>;
+    public class ListSalesQuery : IRequest<PaginatedResponse<SaleDto>>
+    {
+        public int Page { get; set; }
+        public int Size { get; set; }
+        public List<SortOption> SortOptions { get; set; } = new List<SortOption>();      
+        public Dictionary<string, List<FilterOption>> Filters { get; set; } = new Dictionary<string, List<FilterOption>>();
+    }
 }

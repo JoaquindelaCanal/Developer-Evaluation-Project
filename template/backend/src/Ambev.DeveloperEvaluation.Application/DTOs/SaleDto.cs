@@ -12,5 +12,7 @@
         public decimal TotalAmount { get; set; }
         public string Status { get; set; }
         public List<SaleItemDto> Items { get; set; }
+
+        public int NumberOfItems { get; set; }
     }
 }

@@ -26,7 +26,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         private readonly List<SaleItem> _items = new();
         public IReadOnlyCollection<SaleItem> Items => _items.AsReadOnly();
 
-        // Private constructor for EF Core.
         private Sale() : base() { }
 
         public Sale(Guid customerId, string customerName, Guid branchId, string branchName, string saleNumber = null) : base()
