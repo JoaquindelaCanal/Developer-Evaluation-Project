@@ -267,7 +267,7 @@ Alternatively, you can use tools like **Postman** or **cURL** to send requests:
 
 **Example: Create a Sale (POST)**
 
-```bash
+bash
 curl -X POST "https://localhost:7001/api/Sales" \
 -H "accept: */*" \
 -H "Content-Type: application/json" \
